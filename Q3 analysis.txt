@@ -1,0 +1,17 @@
+Since the codes are too long, I only analyzed some main lines
+
+.text:0040150E: i = 100
+
+.text:0040151B loc_40151B: (loop body)
+.text:00401534: a = i's hundreds digit
+.text:0040155B: b = i's tens digit
+.text:00401583: c = i's units digit
+.text:00401587 - .text:004015B5: eax = b * b * b + c * c * c + d * d * d
+.text:004015BB:
+if i != eax jump to loc_4015D1
+print i
+
+.text:004015D1 loc_4015D1: i++
+
+.text:004015D6 loc_4015D6:
+jump to loc_40151B if i < 1000

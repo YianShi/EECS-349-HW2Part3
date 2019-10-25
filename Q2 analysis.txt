@@ -1,0 +1,16 @@
+codes before loc_401560:
+assign 8 values to an array
+initialize [esp+3Ch] = 0 (max = 0), and [esp+38h] = 0 (index = 0)
+
+codes at loc_401560:
+if (arr[index] <= max) then jump to loc_40157A
+max = arr[index]
+
+codes at loc_40157A:
+index++
+
+codes at loc_40157F:
+if (index <= 7) then jump to loc_401560
+
+codes after loc_40157F:
+print max

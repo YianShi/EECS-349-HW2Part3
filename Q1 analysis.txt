@@ -1,0 +1,27 @@
+push    ebp
+mov     ebp, esp
+and     esp, 0FFFFFFF0h
+sub     esp, 20h
+call    ___main
+mov     dword ptr [esp+1Ch], 3		// [esp+1Ch] = 3
+mov     dword ptr [esp+18h], 5		// [esp+18h] = 5
+mov     dword ptr [esp+14h], 0		// [esp+14h] = 0
+mov     eax, [esp+1Ch]			// eax = [esp+1Ch]
+imul    eax, [esp+18h]			// eax = [esp+1Ch] * [esp+18h]
+mov     edx, eax			// edx = [esp+1Ch] * [esp+18h]
+mov     eax, [esp+1Ch]			// eax = [esp+1Ch]
+mov     ecx, eax			// ecx = [esp+1Ch]
+shr     ecx, 1Fh			// ecx = [esp+1Ch]'s sign bit
+add     eax, ecx			// if eax is negative, add 1. Otherwise add 0
+sar     eax, 1				// eax = eax / 2 (ensure negative values are correctly rounded)
+sub     edx, eax			// edx = [esp+1Ch] * [esp+18h] - [esp+1Ch] / 2 
+mov     eax, edx			// eax = edx
+mov     [esp+14h], eax			// [esp+14] = eax	
+mov     eax, [esp+14h]
+mov     [esp+4], eax
+mov     dword ptr [esp], offset aD ; "%d" // print [esp+14]
+call    _printf
+mov     eax, 0
+leave
+retn
+_main endp 
