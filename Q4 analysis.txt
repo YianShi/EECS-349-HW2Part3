@@ -1,0 +1,143 @@
+; int __cdecl main(int argc, const char **argv, const char **envp)
+public _main
+_main proc near
+
+var_19C= dword ptr -19Ch
+argc= dword ptr  8
+argv= dword ptr  0Ch
+envp= dword ptr  10h
+
+push    ebp
+mov     ebp, esp
+and     esp, 0FFFFFFF0h
+sub     esp, 1B0h
+call    ___main
+mov     dword ptr [esp+1A8h], 7		// x = 7
+mov     dword ptr [esp+1A4h], 64h	// length = 100
+mov     dword ptr [esp+1ACh], 0		// i = 0
+jmp     short loc_401619
+
+loc_4015FC:				// assign arr[i] = i + 1
+mov     eax, [esp+1ACh]
+lea     edx, [eax+1]
+mov     eax, [esp+1ACh]
+mov     [esp+eax*4+14h], edx
+add     dword ptr [esp+1ACh], 1
+
+loc_401619:				// print proc1(arr, length, x)
+mov     eax, [esp+1ACh]
+cmp     eax, [esp+1A4h]
+jl      short loc_4015FC
+
+mov     eax, [esp+1A8h]
+mov     [esp+8], eax    ; int
+mov     eax, [esp+1A4h]
+mov     [esp+4], eax    ; int
+lea     eax, [esp+1B0h+var_19C]
+mov     [esp], eax      ; int *
+call    __Z5proc1Piii   ; proc1(int *,int,int)
+mov     [esp+4], eax
+mov     dword ptr [esp], offset aD ; "%d\n"
+call    _printf
+mov     eax, 0
+leave
+retn
+_main endp
+
+
+// remove arr[i] whose index is the multiple of x over and over
+// return the last removed value
+; _DWORD __cdecl proc1(int *, int, int)
+public __Z5proc1Piii
+__Z5proc1Piii proc near
+
+var_10= dword ptr -10h
+var_C= dword ptr -0Ch
+var_8= dword ptr -8
+var_4= dword ptr -4
+arg_0= dword ptr  8
+arg_4= dword ptr  0Ch
+arg_8= dword ptr  10h
+
+push    ebp
+mov     ebp, esp
+sub     esp, 10h
+mov     [ebp+var_C], 0		// i = 0
+mov     [ebp+var_10], 0		// removedValue = 0
+mov     [ebp+var_4], 0		// count = 0
+jmp     loc_4015B7
+
+loc_401520:			// loop1 body
+mov     [ebp+var_8], 1		// ordinal = 1
+jmp     short loc_40155E
+
+loc_401529:			// loop2 body
+jmp     short loc_401538
+
+loc_40152B:			// loop3 body
+mov     eax, [ebp+var_C]	// ordinal++
+add     eax, 1			// i = (i + 1) % length
+cdq
+idiv    [ebp+arg_4]
+mov     [ebp+var_C], edx
+
+loc_401538:			// loop3 when (arr[i] == 0)
+mov     eax, [ebp+var_C]	// jump to loc_40152B
+lea     edx, ds:0[eax*4]
+mov     eax, [ebp+arg_0]
+add     eax, edx
+mov     eax, [eax]
+test    eax, eax
+jz      short loc_40152B
+
+add     [ebp+var_8], 1		// i = (i + 1) % length
+mov     eax, [ebp+var_C]
+add     eax, 1
+cdq
+idiv    [ebp+arg_4]
+mov     [ebp+var_C], edx
+
+loc_40155E:			// loop2 when (ordinal < x)
+mov     eax, [ebp+var_8]	// if (ordinal < x) jump to loc_401529
+cmp     eax, [ebp+arg_8]	// else jump to loc_401575 (end loop2)
+jl      short loc_401529
+
+jmp     short loc_401575
+
+loc_401568:			// loop4 body:
+mov     eax, [ebp+var_C]	// i = (i + 1) % length
+add     eax, 1
+Cdq
+idiv    [ebp+arg_4]
+mov     [ebp+var_C], edx
+
+loc_401575:			// loop4 when (arr[i] = 0)
+mov     eax, [ebp+var_C]
+lea     edx, ds:0[eax*4]
+mov     eax, [ebp+arg_0]
+add     eax, edx
+mov     eax, [eax]
+test    eax, eax
+jz      short loc_401568
+
+mov     eax, [ebp+var_C]
+lea     edx, ds:0[eax*4]
+mov     eax, [ebp+arg_0]
+add     eax, edx
+mov     eax, [eax]
+mov     [ebp+var_10], eax	// removedValue = arr[i]
+mov     eax, [ebp+var_C]
+lea     edx, ds:0[eax*4]
+mov     eax, [ebp+arg_0]
+add     eax, edx
+mov     dword ptr [eax], 0	// arr[i] = 0
+add     [ebp+var_4], 1		// count++
+
+loc_4015B7:			// loop1 when count < length
+mov     eax, [ebp+var_4]
+cmp     eax, [ebp+arg_4]
+jl      loc_401520
+mov     eax, [ebp+var_10]
+leave
+Retn
+__Z5proc1Piii endp
